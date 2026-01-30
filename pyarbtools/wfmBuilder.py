@@ -270,7 +270,9 @@ def import_mat(fileName, targetVariable="data"):
     if "fs" in matData.keys():
         fs = float(matData["fs"][0, 0])
     else:
-        fs = 1
+        fs = 1e6
+
+    data = np.concatenate([data, np.zeros(1000, dtype=data.dtype)])
 
     return {"data": data, "fs": fs, "wfmID": wfmID, "wfmFormat": wfmFormat}
 

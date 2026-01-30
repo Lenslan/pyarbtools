@@ -115,13 +115,13 @@ def vsg_am_example(ipAddress):
 def vsg_mtone_example(ipAddress):
     """Generates a mutlitone signal on a generic VSG."""
 
-    vsg = pyarbtools.instruments.VSG(ipAddress, apiType='pyvisa', protocol='hislip', port=0, timeout=3, reset=True)
+    vsg = pyarbtools.instruments.VSG(ipAddress,timeout=3)
     # vsg = pyarbtools.instruments.VSG(ipAddress, port=5025, timeout=15, reset=True)
 
     # Signal generator configuration variables
-    amplitude = -5
-    sampleRate = 100e6
-    freq = 1e9
+    amplitude = 4
+    sampleRate = 100e3
+    freq = 3e6
 
     # Configure signal generator
     vsg.configure(amp=amplitude, fs=sampleRate, cf=freq)
@@ -142,6 +142,7 @@ def vsg_mtone_example(ipAddress):
 
     # Check for errors and gracefully disconnect
     vsg.err_check()
+    input()
     vsg.close()
 
 
@@ -410,20 +411,20 @@ def vxg_mat_import_example(ipAddress, fileName):
     """
 
     # Load waveform from .mat file
-    wfmDict = pyarbtools.wfmBuilder.import_mat(fileName, targetVariable="iqdata")
+    wfmDict = pyarbtools.wfmBuilder.import_mat(fileName, targetVariable="RIUOut")
 
     # Create VXG object
-    vxg = pyarbtools.instruments.VXG(ipAddress, apiType='pyvisa', protocol='hislip', port=1, timeout=3, reset=True)
+    vxg = pyarbtools.instruments.VSG(ipAddress,timeout=3, reset=True)
     # vxg = pyarbtools.instruments.VXG(ipAddress, port=5025, timeout=15, reset=True)
 
     # Configure vxg based on variables imported from the .mat file
-    vxg.configure(cf2=1e9, fs2=wfmDict["fs"], rfState2=1, amp2=0)
+    vxg.configure(cf=200e6, fs=40e6, rfState=1, amp=-4)
 
     # Download waveform to vxg by passing the complex array of samples and the waveform name from the dict
     vxg.download_wfm(wfmDict["data"], wfmID=wfmDict["wfmID"])
 
     # Play out the waveform by referencing the waveform name from the dict
-    vxg.play(wfmID=wfmDict["wfmID"], ch=2)
+    vxg.play(wfmID=wfmDict["wfmID"])
 
     vxg.close()
 
@@ -472,8 +473,9 @@ def main():
     """Uncomment the example you'd like to run. For each example,
     replace the IP address with one that is appropriate for your
     instrument(s)."""
-    ipAddress = "141.184.2.107"
-    matFilePath = "<insert path to .mat file here>"
+    ipAddress = "192.168.1.100"
+    # matFilePath = "D:/wechat_doc/com_wechat_doc/WXWork/1688856744803585/Cache/File/2026-01/RIUOut.mat"
+    matFilePath = "D:/wechat_doc/com_wechat_doc/WXWork/1688856744803585/Cache/File/2026-01/RIUOut_2x.mat"
 
     # m8190a_simple_wfm_example(ipAddress)
     # m8190a_duc_dig_mod_example(ipAddress)
@@ -486,11 +488,12 @@ def main():
     # vsg_mtone_example(ipAddress)
     # wfm_to_vsa_example(ipAddress)
     # vsa_vector_example(ipAddress)
-    # vxg_mat_import_example(ipAddress, fileName=matFilePath)
-    vxg_dig_mod_example(ipAddress)
+    vxg_mat_import_example(ipAddress, fileName=matFilePath)
+    # vxg_dig_mod_example(ipAddress)
     # m8190a_sequence_example(ipAddress)
     # gui_example()
 
 
 if __name__ == "__main__":
     main()
+    # pyarbtools.gui.main()
